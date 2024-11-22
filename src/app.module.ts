@@ -7,9 +7,10 @@ import { RedisService } from 'redis/redis.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
-import { User } from 'entity/user.entity';
-import { Question } from 'entity/question.entity';
+import { User } from 'users/entities/user.entity';
+import { Question } from 'questions/entities/question.entity';
 
+// todo: move mysql module
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,7 +25,7 @@ import { Question } from 'entity/question.entity';
       password: `${process.env.DB_PASSWORD}`,
       port: parseInt(`${process.env.DB_PORT}`),
       database: `${process.env.DB_DATABASE}`,
-      entities: [User, Question],
+      entities: [],
       synchronize: true,
     }),
     UsersModule,
