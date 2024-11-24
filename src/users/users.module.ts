@@ -3,7 +3,7 @@ import { UsersController } from 'users/users.controller';
 import { UsersService } from 'users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
-import { User } from 'entity/user.entity';
+import { User } from 'users/entities/user.entity';
 import { RedisService } from 'redis/redis.service';
 import { ConfigService } from '@nestjs/config';
 
