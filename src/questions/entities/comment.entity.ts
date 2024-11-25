@@ -2,8 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Question } from 'questions/entities/question.entity';
@@ -14,15 +14,29 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.commentedQuestions)
-  writer: User;
+  @Column('int')
+  writerId: number; // FK
 
-  @ManyToOne(() => Question, (question) => question.comments)
-  question: Question;
+  @Column('int')
+  questionId: number; // FK
 
   @Column('varchar', { length: 100, nullable: true })
   context: string;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // relations
+  @ManyToOne(() => User, (user) => user.writtenComments, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE', // when user is deleted, delete all comments by writer?
+  })
+  @JoinColumn({ name: 'writerId' })
+  writer: User;
+
+  @ManyToOne(() => Question, (question) => question.comments, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  question: Question;
 }
