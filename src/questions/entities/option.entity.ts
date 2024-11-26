@@ -7,7 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Question } from 'questions/entities/question.entity';
+import { Question } from './question.entity';
 import { UserOption } from 'users/entities/user-option.entity';
 
 @Entity({ name: 'options', comment: 'Option' })

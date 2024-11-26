@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { Option } from 'questions/entities/option.entity';
-import { Comment } from 'questions/entities/comment.entity';
+import { Option } from './option.entity';
+import { Comment } from './comment.entity';
 
 enum CATEGORY {
   LIVING,

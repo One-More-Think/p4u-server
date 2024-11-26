@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Question } from 'questions/entities/question.entity';
 import { User } from 'users/entities/user.entity';
+import { Question } from './question.entity';
 
 @Entity({ name: 'comments', comment: 'Commented on question' })
 export class Comment {
