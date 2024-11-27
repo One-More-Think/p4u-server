@@ -2,28 +2,36 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
+  JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Question } from 'questions/entities/question.entity';
-import { User } from 'users/entities/user.entity';
+import { Question } from './question.entity';
+import { UserOption } from 'users/entities/user-option.entity';
 
 @Entity({ name: 'options', comment: 'Option' })
 export class Option {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Question, (question) => question.options)
-  question: Question;
+  @Column('int')
+  questionId: number; // FK
 
-  @Column('varchar', { length: 100, nullable: true })
+  @Column('varchar', { length: 100 })
   context: string;
-
-  @ManyToMany(() => User, (user) => user.id)
-  users: User[];
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // relations
+  @ManyToOne(() => Question, (question) => question.options, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'questionId' })
+  question: Question;
+
+  @OneToMany(() => UserOption, (userOption) => userOption.option)
+  selectedUsers: UserOption[];
 }

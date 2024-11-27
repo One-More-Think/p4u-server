@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from 'users/users.controller';
-import { UsersService } from 'users/users.service';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HttpModule } from '@nestjs/axios';
-import { User } from 'users/entities/user.entity';
-import { RedisService } from 'redis/redis.service';
-import { ConfigService } from '@nestjs/config';
+import { User } from './entities/user.entity';
+import { UserOption } from './entities/user-option.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), HttpModule],
+  imports: [TypeOrmModule.forFeature([User, UserOption])],
   controllers: [UsersController],
-  providers: [UsersService, RedisService, ConfigService],
+  providers: [UsersService],
 })
 export class UsersModule {}

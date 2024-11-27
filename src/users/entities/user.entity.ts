@@ -1,6 +1,15 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Comment } from 'questions/entities/comment.entity';
+import { Question } from 'questions/entities/question.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { UserOption } from './user-option.entity';
 
-@Entity({ name: 'users', comment: '유저' })
+@Entity({ name: 'users', comment: 'User' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -39,10 +48,12 @@ export class User {
   createdAt: Date;
 
   // relations
+  @OneToMany(() => Question, (question) => question.writer)
+  writtenQuestions: Question[];
 
-  // written quiestions
-  // questions
+  @OneToMany(() => Comment, (comment) => comment.writer)
+  writtenComments: Comment[];
 
-  // commented questions > x
-  // comments
+  @OneToMany(() => UserOption, (userOption) => userOption.user)
+  selectedOptions: UserOption[];
 }
