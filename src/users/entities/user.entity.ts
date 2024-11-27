@@ -56,4 +56,12 @@ export class User {
 
   @OneToMany(() => UserOption, (userOption) => userOption.user)
   selectedOptions: UserOption[];
+
+  static create(snsId: string, snsType: string, email: string) {
+    const user = new User();
+    user.snsId = snsId;
+    user.snsType = snsType;
+    user.email = email;
+    return user;
+  }
 }

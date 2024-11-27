@@ -4,6 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
+import { generatePayload } from './rules';
+import { AccessTokenPayload } from './types';
+import { JWT_KEY } from 'config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +17,31 @@ export class AuthService {
     private userRepository: Repository<User>,
   ) {}
 
-  async signIn() {}
+  async signIn(user: User) {
+    const payload = generatePayload(user);
+    const accessToken = await this.generateAccessToken(payload);
+    const refreshToken = await this.generateRefreshToken(user.id);
 
-  async generateAccessToken() {}
+    return {
+      user: { id: user.id },
+      accessToken,
+      refreshToken,
+    };
+  }
 
-  async generateRefreshToken() {}
+  async generateAccessToken(payload: AccessTokenPayload) {
+    // console.log(this.configService)
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get(JWT_KEY.ACCESS_SECRET_KEY),
+      expiresIn: this.configService.get(JWT_KEY.ACCESS_EXPIRATION_TIME),
+    });
+  }
+
+  async generateRefreshToken(userId: number) {
+    // TODO refresh token & ttl setting
+    console.log('userId => ', userId);
+    return 'This is refresh token';
+  }
 
   async refreshAccessToken() {}
 
