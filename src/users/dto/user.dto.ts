@@ -9,6 +9,11 @@ class SignInDto {
   @IsString()
   @IsNotEmpty()
   idToken: string;
+
+  @ApiProperty({ name: 'country', description: 'user location from the app' })
+  @IsString()
+  @IsNotEmpty()
+  country: string;
 }
 
 /**

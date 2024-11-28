@@ -19,7 +19,7 @@ export class UsersService {
       const result = await axios.get(
         `https://oauth2.googleapis.com/tokeninfo?id_token=${dto.idToken}`,
       );
-      console.log('Result => ', result); // check google api response
+      console.log('Result => ', result.data); // check google api response
       const { email, sub: snsId } = result.data;
       // const email = 'minho.lee0716@gmail.com'; // test
       // const snsId = 'asd65f4a76sd5fasasd456asd5f45'; // test
@@ -37,7 +37,7 @@ export class UsersService {
 
       if (!originUser) {
         // create user
-        const newUser = User.create(snsId, 'google', email);
+        const newUser = User.create(snsId, 'google', email, dto.country);
         await this.usersRepository.save(newUser);
         const user = await this.usersRepository.findOne({
           where: { snsType: 'google', snsId, email },

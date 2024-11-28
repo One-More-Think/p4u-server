@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from 'app.module';
@@ -13,9 +13,9 @@ export const initApp = (app: INestApplication): INestApplication => {
 
 const bootstrap = async () => {
   let app = await NestFactory.create(AppModule, { bufferLogs: true });
-
+  let logger = new Logger();
   const configService = app.get(ConfigService);
-  console.log('ENVIRONMENT:', process.env.ENVIRONMENT);
+  logger.debug(`ENVIRONMENT: ${process.env.ENVIRONMENT}`);
 
   app = initApp(app);
 
@@ -23,5 +23,6 @@ const bootstrap = async () => {
   setupDocument(app, 'api');
 
   await app.listen(configService.get('app.port'));
+  logger.debug(`App port is  ${configService.get('app.port')}`);
 };
 bootstrap();
