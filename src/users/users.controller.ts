@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SignInGoogleDto } from './dto/user.dto';
+import { SignInAppleDto, SignInGoogleDto } from './dto/user.dto';
 
 @ApiTags('User')
 @Controller({ path: 'users' })
@@ -14,6 +14,18 @@ export class UsersController {
     try {
       console.log(dto);
       return await this.usersService.signInGoogle(dto);
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'Apple Login' })
+  @Post('sign-in/apple')
+  async signInApple(@Body() dto: SignInAppleDto) {
+    try {
+      console.log(dto);
+      return await this.usersService.signInApple(dto);
     } catch (error) {
       console.log(error.message);
       throw error;

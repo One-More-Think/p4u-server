@@ -2,9 +2,10 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { SignInGoogleDto } from './dto/user.dto';
+import { SignInAppleDto, SignInGoogleDto } from './dto/user.dto';
 import axios from 'axios';
 import { AuthService } from 'auth/auth.service';
+import appleSigninAuth from 'apple-signin-auth';
 
 @Injectable()
 export class UsersService {
@@ -21,9 +22,6 @@ export class UsersService {
       );
       console.log('Result => ', result); // check google api response
       const { email, sub: snsId } = result.data;
-      // const email = 'minho.lee0716@gmail.com'; // test
-      // const snsId = 'asd65f4a76sd5fasasd456asd5f45'; // test
-
       const originUser = await this.usersRepository.findOne({
         where: { snsType: 'google', snsId, email },
       });
@@ -51,5 +49,33 @@ export class UsersService {
     }
   }
 
-  async signInApple() {}
+  async signInApple(dto: SignInAppleDto) {
+    try {
+      const { sub, email } = await appleSigninAuth.verifyIdToken(dto.idToken);
+      const originUser = await this.usersRepository.findOne({
+        where: { snsType: 'apple', snsId: sub, email },
+      });
+      if (originUser) {
+        if (originUser.isBanned) {
+          throw new ForbiddenException('Banned user');
+        }
+        console.log('Already user, sign in');
+        return await this.authService.signIn(originUser);
+      }
+
+      if (!originUser) {
+        // create user
+        const newUser = User.create(sub, 'apple', email);
+        await this.usersRepository.save(newUser);
+        const user = await this.usersRepository.findOne({
+          where: { snsType: 'apple', snsId: sub, email },
+        });
+        console.log('New user, sign in');
+        return await this.authService.signIn(user);
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
 }
