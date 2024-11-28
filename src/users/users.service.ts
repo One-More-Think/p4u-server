@@ -1,39 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { LoginDto, LoginPostDto } from 'users/user.dto';
+import { SignInAppleDto, SignInGoogleDto } from './dto/user.dto';
+import axios from 'axios';
+import { AuthService } from 'auth/auth.service';
+import appleSigninAuth from 'apple-signin-auth';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private authService: AuthService,
   ) {}
 
-  async findOneUser(id: number): Promise<User> {
+  async signInGoogle(dto: SignInGoogleDto) {
     try {
-      return await this.usersRepository.findOneBy({ id });
-    } catch (err) {
-      throw new Error('Failed to find user');
+      const result = await axios.get(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${dto.idToken}`,
+      );
+      console.log('Result => ', result); // check google api response
+      const { email, sub: snsId } = result.data;
+      const originUser = await this.usersRepository.findOne({
+        where: { snsType: 'google', snsId, email },
+      });
+      if (originUser) {
+        if (originUser.isBanned) {
+          throw new ForbiddenException('Banned user');
+        }
+        console.log('Already user, sign in');
+        return await this.authService.signIn(originUser);
+      }
+
+      if (!originUser) {
+        // create user
+        const newUser = User.create(snsId, 'google', email);
+        await this.usersRepository.save(newUser);
+        const user = await this.usersRepository.findOne({
+          where: { snsType: 'google', snsId, email },
+        });
+        console.log('New user, sign in');
+        return await this.authService.signIn(user);
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw error;
     }
   }
 
-  async loginUser(sns: string, data: LoginPostDto): Promise<LoginDto> {
+  async signInApple(dto: SignInAppleDto) {
     try {
-      // WIP implement login user
-      let res: LoginDto;
-      return res;
-    } catch (err) {
-      throw new Error('Failed to create user');
-    }
-  }
+      const { sub, email } = await appleSigninAuth.verifyIdToken(dto.idToken);
+      const originUser = await this.usersRepository.findOne({
+        where: { snsType: 'apple', snsId: sub, email },
+      });
+      if (originUser) {
+        if (originUser.isBanned) {
+          throw new ForbiddenException('Banned user');
+        }
+        console.log('Already user, sign in');
+        return await this.authService.signIn(originUser);
+      }
 
-  async removeUser(id: number): Promise<void> {
-    try {
-      await this.usersRepository.delete(id);
-    } catch (err) {
-      throw new Error('Failed to delete user');
+      if (!originUser) {
+        // create user
+        const newUser = User.create(sub, 'apple', email);
+        await this.usersRepository.save(newUser);
+        const user = await this.usersRepository.findOne({
+          where: { snsType: 'apple', snsId: sub, email },
+        });
+        console.log('New user, sign in');
+        return await this.authService.signIn(user);
+      }
+    } catch (error) {
+      console.log(error.message);
+      throw error;
     }
   }
 }

@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from 'app.module';
+import { setupDocument } from 'common/swagger';
 
 export const initApp = (app: INestApplication): INestApplication => {
   // cors
@@ -18,7 +19,8 @@ const bootstrap = async () => {
 
   app = initApp(app);
 
-  // TODO: setup docs
+  // swagger
+  setupDocument(app, 'api');
 
   await app.listen(configService.get('app.port'));
 };
