@@ -26,10 +26,6 @@ export class UpdateUserDto {
   @IsString()
   country?: string;
 
-  @ApiProperty({ name: 'language' })
-  @IsString()
-  language?: string;
-
   @ApiProperty({ name: 'gender' })
   @IsString()
   gender: string;
