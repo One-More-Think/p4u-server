@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { SignInAppleDto, SignInGoogleDto } from './dto/user.dto';
+import { SignInAppleDto, SignInGoogleDto, UpdateUserDto } from './dto/user.dto';
 import axios from 'axios';
 import { AuthService } from 'auth/auth.service';
 import appleSigninAuth from 'apple-signin-auth';
@@ -20,7 +20,6 @@ export class UsersService {
       const result = await axios.get(
         `https://oauth2.googleapis.com/tokeninfo?id_token=${dto.idToken}`,
       );
-      console.log('Result => ', result); // check google api response
       const { email, sub: snsId } = result.data;
       const originUser = await this.usersRepository.findOne({
         where: { snsType: 'google', snsId, email },
@@ -29,7 +28,6 @@ export class UsersService {
         if (originUser.isBanned) {
           throw new ForbiddenException('Banned user');
         }
-        console.log('Already user, sign in');
         return await this.authService.signIn(originUser);
       }
 
@@ -40,7 +38,6 @@ export class UsersService {
         const user = await this.usersRepository.findOne({
           where: { snsType: 'google', snsId, email },
         });
-        console.log('New user, sign in');
         return await this.authService.signIn(user);
       }
     } catch (error) {
@@ -59,7 +56,6 @@ export class UsersService {
         if (originUser.isBanned) {
           throw new ForbiddenException('Banned user');
         }
-        console.log('Already user, sign in');
         return await this.authService.signIn(originUser);
       }
 
@@ -70,9 +66,19 @@ export class UsersService {
         const user = await this.usersRepository.findOne({
           where: { snsType: 'apple', snsId: sub, email },
         });
-        console.log('New user, sign in');
         return await this.authService.signIn(user);
       }
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+
+  async updateUser(userId: number, dto: UpdateUserDto) {
+    try {
+      let user = await this.usersRepository.findOne({ where: { id: userId } });
+      user = { ...user, ...dto };
+      await this.usersRepository.update(userId, user);
     } catch (error) {
       console.log(error.message);
       throw error;
