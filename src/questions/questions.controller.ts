@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { QuestionsService } from './questions.service';
 
 @ApiTags('Question')
@@ -7,9 +7,31 @@ import { QuestionsService } from './questions.service';
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
-  @ApiOperation({ summary: 'Get Questions' })
+  @ApiOperation({
+    summary: 'Get Questions',
+    description: `Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset's default value** is \`0\` and **limit's default value** is \`10\`.`,
+  })
+  @ApiQuery({
+    name: 'offset',
+    type: Number,
+    required: false,
+    description: 'Offset means page.',
+    example: 0,
+    default: 0,
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Limit means the number of questions per page.',
+    example: 10,
+    default: 10,
+  })
   @Get()
-  async getQuestions() {
-    return await this.questionsService.getQuestions();
+  async getQuestions(
+    @Query('offset') offset: number = 0,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.questionsService.getQuestions(+offset, +limit);
   }
 }

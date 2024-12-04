@@ -10,9 +10,11 @@ export class QuestionsService {
     private questionRepository: Repository<Question>,
   ) {}
 
-  async getQuestions() {
+  async getQuestions(offset: number, limit: number) {
     return await this.questionRepository.find({
       order: { id: 'DESC' },
+      skip: limit * offset,
+      take: limit,
     });
   }
 }
