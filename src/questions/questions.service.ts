@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './entities/question.entity';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
@@ -23,5 +23,9 @@ export class QuestionsService {
       .skip(limit * offset)
       .take(limit)
       .getMany();
+  }
+
+  async getQuestionById(questionId: number) {
+    return await this.questionRepository.findOne({ where: { id: questionId } });
   }
 }

@@ -1,5 +1,12 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { QuestionsService } from './questions.service';
 
 @ApiTags('Question')
@@ -42,5 +49,24 @@ export class QuestionsController {
     @Query('search') search: string | null = null,
   ) {
     return await this.questionsService.getQuestions(search, +offset, +limit);
+  }
+
+  @ApiOperation({
+    summary: 'Get Question',
+    description: 'Get a question by questionId.',
+  })
+  @ApiParam({
+    name: 'questionId',
+    type: Number,
+    description: 'Question ID',
+    example: 1,
+  })
+  @Get(':questionId')
+  async getQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
+    const question = await this.questionsService.getQuestionById(questionId);
+    if (!question) {
+      throw new NotFoundException(`Question ID ${questionId} not found.`);
+    }
+    return question;
   }
 }
