@@ -27,11 +27,20 @@ export class QuestionsController {
     example: 10,
     default: 10,
   })
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+    description: 'Search by title or description.',
+    example: 'question',
+    default: null,
+  })
   @Get()
   async getQuestions(
     @Query('offset') offset: number = 0,
     @Query('limit') limit: number = 10,
+    @Query('search') search: string | null = null,
   ) {
-    return await this.questionsService.getQuestions(+offset, +limit);
+    return await this.questionsService.getQuestions(search, +offset, +limit);
   }
 }

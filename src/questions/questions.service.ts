@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './entities/question.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
@@ -10,11 +10,18 @@ export class QuestionsService {
     private questionRepository: Repository<Question>,
   ) {}
 
-  async getQuestions(offset: number, limit: number) {
-    return await this.questionRepository.find({
-      order: { id: 'DESC' },
-      skip: limit * offset,
-      take: limit,
-    });
+  async getQuestions(search: string, offset: number, limit: number) {
+    return await this.questionRepository
+      .createQueryBuilder('question')
+      .where(
+        search
+          ? 'question.title LIKE :search OR question.description LIKE :search'
+          : '1=1',
+        { search: `%${search}%` },
+      )
+      .orderBy('question.id', 'DESC')
+      .skip(limit * offset)
+      .take(limit)
+      .getMany();
   }
 }
