@@ -11,7 +11,7 @@ import { User } from 'users/entities/user.entity';
 import { Option } from './option.entity';
 import { Comment } from './comment.entity';
 
-enum CATEGORY {
+export enum CATEGORY {
   LIVING,
   CAREER,
   FOOD,

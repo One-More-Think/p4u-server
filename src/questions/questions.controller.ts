@@ -1,13 +1,26 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
   ParseIntPipe,
+  Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { QuestionsService } from './questions.service';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { User } from 'auth/user.decorator';
+import { AccessTokenPayload } from 'auth/types';
+import { JwtAuthGuard } from 'auth/jwt-auth.guard';
 
 @ApiTags('Question')
 @Controller({ path: 'questions' })
@@ -49,6 +62,17 @@ export class QuestionsController {
     @Query('search') search: string | null = null,
   ) {
     return await this.questionsService.getQuestions(search, +offset, +limit);
+  }
+
+  @ApiOperation({ summary: 'Create Question' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async createQuestion(
+    @User() user: AccessTokenPayload,
+    @Body() dto: CreateQuestionDto,
+  ) {
+    return await this.questionsService.createQuestion(dto, user.id);
   }
 
   @ApiOperation({
