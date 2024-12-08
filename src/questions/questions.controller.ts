@@ -87,10 +87,6 @@ export class QuestionsController {
   })
   @Get(':questionId')
   async getQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
-    const question = await this.questionsService.getQuestionById(questionId);
-    if (!question) {
-      throw new NotFoundException(`Question ID ${questionId} not found.`);
-    }
-    return question;
+    return await this.questionsService.getQuestionById(questionId);
   }
 }

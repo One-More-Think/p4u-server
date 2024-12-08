@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './entities/question.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -29,7 +33,19 @@ export class QuestionsService {
   }
 
   async getQuestionById(questionId: number) {
-    return await this.questionRepository.findOne({ where: { id: questionId } });
+    const question = await this.questionRepository.findOne({
+      where: { id: questionId },
+      relations: ['writer', 'options', 'comments', 'comments.writer'],
+    });
+    if (!question) {
+      throw new NotFoundException(`Question ID ${questionId} not found.`);
+    }
+    delete question.writer.snsId;
+    delete question.writer.snsType;
+    delete question.writer.email;
+    delete question.writer.isBanned;
+    delete question.writer.createdAt;
+    return question;
   }
 
   async createQuestion(dto: CreateQuestionDto, writerId: number) {
