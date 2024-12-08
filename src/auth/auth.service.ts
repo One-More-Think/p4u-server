@@ -21,9 +21,17 @@ export class AuthService {
     const payload = generatePayload(user);
     const accessToken = await this.generateAccessToken(payload);
     const refreshToken = await this.generateRefreshToken(user.id);
-
+    const userInfo = {
+      id: user.id,
+      email: user.email,
+      age: user.age,
+      gender: user.gender,
+      aboutMe: user.aboutMe,
+      country: user.country,
+      occupation: user.occupation,
+    };
     return {
-      user: { id: user.id },
+      userInfo,
       accessToken,
       refreshToken,
     };
