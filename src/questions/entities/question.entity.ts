@@ -26,11 +26,16 @@ export class Question {
   @Column('int')
   writerId: number; // FK
 
-  @Column('varchar', { length: 30, nullable: true })
-  language?: string;
+  @Column('varchar', { length: 30, nullable: false, default: 'en' })
+  language: string;
 
-  @Column({ type: 'enum', enum: CATEGORY, nullable: true })
-  category?: CATEGORY;
+  @Column({
+    type: 'enum',
+    enum: CATEGORY,
+    nullable: false,
+    default: CATEGORY.LIVING,
+  })
+  category: CATEGORY;
 
   @Column('varchar', { length: 300 })
   title: string;
@@ -38,8 +43,8 @@ export class Question {
   @Column('varchar', { length: 500, nullable: true })
   description?: string;
 
-  @Column('smallint', { nullable: true })
-  report?: number; // null? or default 0?
+  @Column('smallint', { nullable: false, default: 0 })
+  report?: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -47,7 +52,7 @@ export class Question {
   // relations
   @ManyToOne(() => User, (user) => user.writtenQuestions, {
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE', // when user is deleted, delete all questions by writer?
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'writerId' })
   writer: User;

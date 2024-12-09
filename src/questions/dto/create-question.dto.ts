@@ -17,10 +17,17 @@ export class CreateQuestionDto {
   description: string;
 
   @ApiProperty({
+    name: 'description',
+    description: 'Language of the question',
+    example: 'en',
+  })
+  language: string;
+
+  @ApiProperty({
     name: 'category',
     description: 'Category of the question',
-    example: CATEGORY,
-    required: false,
+    example: CATEGORY.LIVING,
+    required: true,
   })
   category: CATEGORY;
 

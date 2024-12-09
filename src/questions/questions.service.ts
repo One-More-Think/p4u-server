@@ -20,6 +20,16 @@ export class QuestionsService {
   async getQuestions(search: string, offset: number, limit: number) {
     return await this.questionRepository
       .createQueryBuilder('question')
+      .select([
+        'question.id',
+        'question.title',
+        'question.language',
+        'writer.country',
+        'writer.age',
+        'writer.occupation',
+        'writer.gender',
+      ])
+      .leftJoin('question.writer', 'writer')
       .where(
         search
           ? 'question.title LIKE :search OR question.description LIKE :search'
