@@ -17,7 +17,7 @@ export class CreateQuestionDto {
   description: string;
 
   @ApiProperty({
-    name: 'description',
+    name: 'language',
     description: 'Language of the question',
     example: 'en',
   })

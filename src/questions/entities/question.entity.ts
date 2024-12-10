@@ -26,15 +26,10 @@ export class Question {
   @Column('int')
   writerId: number; // FK
 
-  @Column('varchar', { length: 30, nullable: false, default: 'en' })
+  @Column('varchar', { length: 30, default: 'en' })
   language: string;
 
-  @Column({
-    type: 'enum',
-    enum: CATEGORY,
-    nullable: false,
-    default: CATEGORY.LIVING,
-  })
+  @Column({ type: 'enum', enum: CATEGORY, default: CATEGORY.LIVING })
   category: CATEGORY;
 
   @Column('varchar', { length: 300 })
@@ -43,8 +38,8 @@ export class Question {
   @Column('varchar', { length: 500, nullable: true })
   description?: string;
 
-  @Column('smallint', { nullable: false, default: 0 })
-  report?: number;
+  @Column('smallint', { default: 0 })
+  report: number;
 
   @CreateDateColumn()
   createdAt: Date;
