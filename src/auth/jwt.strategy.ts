@@ -17,6 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload: AccessTokenPayload) {
     // TODO validate payload (business logic)
-    return { ...payload };
+    return payload;
   }
 }

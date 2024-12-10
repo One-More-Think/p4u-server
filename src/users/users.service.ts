@@ -21,6 +21,10 @@ export class UsersService {
         `https://oauth2.googleapis.com/tokeninfo?id_token=${dto.idToken}`,
       );
       const { email, sub: snsId } = result.data;
+
+      // local test
+      // const email = 'minho.lee0716@gmail.com';
+      // const snsId = 'asdfwfsadf5s8sadfas56d';
       const originUser = await this.usersRepository.findOne({
         where: { snsType: 'google', snsId, email },
       });
