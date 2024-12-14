@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -54,4 +58,27 @@ export class AuthService {
   async refreshAccessToken() {}
 
   async revokeRefreshToken() {}
+
+  async getMe(userId: number) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found.');
+      }
+      if (user.isBanned) {
+        throw new ForbiddenException('Banned user.');
+      }
+      return {
+        id: user.id,
+        snsId: user.snsId,
+        snsType: user.snsType,
+        email: user.email,
+      };
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
 }
