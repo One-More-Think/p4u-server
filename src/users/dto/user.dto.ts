@@ -12,6 +12,27 @@ class SignInDto {
 }
 
 /**
+ * Admin Sign In DTO
+ */
+export class SignInAdminDto {
+  /**
+   * Admin ID
+   */
+  @ApiProperty({ name: 'id', description: 'Admin ID' })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  /**
+   * Admin password
+   */
+  @ApiProperty({ name: 'password', description: 'Admin password' })
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+
+/**
  * Google Sign In DTO
  */
 export class SignInGoogleDto extends SignInDto {}
