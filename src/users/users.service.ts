@@ -1,8 +1,17 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { SignInAppleDto, SignInGoogleDto, UpdateUserDto } from './dto/user.dto';
+import {
+  SignInAdminDto,
+  SignInAppleDto,
+  SignInGoogleDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import axios from 'axios';
 import { AuthService } from 'auth/auth.service';
 import appleSigninAuth from 'apple-signin-auth';
@@ -14,6 +23,21 @@ export class UsersService {
     private usersRepository: Repository<User>,
     private authService: AuthService,
   ) {}
+
+  async signInAdmin(dto: SignInAdminDto) {
+    try {
+      const user = await this.usersRepository.findOne({
+        where: { email: dto.id, snsId: dto.password },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return await this.authService.signIn(user);
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
 
   async signInGoogle(dto: SignInGoogleDto) {
     try {

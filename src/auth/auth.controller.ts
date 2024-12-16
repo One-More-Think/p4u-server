@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { User } from './user.decorator';
 import { AccessTokenPayload } from './types';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +13,7 @@ export class AuthController {
     summary: 'Get Me',
     description: 'Get my information by using the access token.',
   })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@User() user: AccessTokenPayload) {
