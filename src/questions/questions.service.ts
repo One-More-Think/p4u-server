@@ -55,6 +55,16 @@ export class QuestionsService {
     delete question.writer.email;
     delete question.writer.isBanned;
     delete question.writer.createdAt;
+    delete question.writer.aboutMe;
+    question.comments.map((comment) => {
+      delete comment.writer.snsId;
+      delete comment.writer.snsType;
+      delete comment.writer.email;
+      delete comment.writer.isBanned;
+      delete comment.writer.createdAt;
+      delete comment.writer.aboutMe;
+    });
+    question.comments = question.comments.sort((a, b) => b.id - a.id);
     return question;
   }
 

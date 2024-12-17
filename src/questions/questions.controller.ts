@@ -89,11 +89,14 @@ export class QuestionsController {
     description: 'Question ID',
     example: 1,
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':questionId')
   async getQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
     return await this.questionsService.getQuestionById(questionId);
   }
 
+  @ApiOperation({ summary: 'Create Comment' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(':questionId/comments')
