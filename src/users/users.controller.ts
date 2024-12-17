@@ -9,7 +9,12 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SignInAppleDto, SignInGoogleDto, UpdateUserDto } from './dto/user.dto';
+import {
+  SignInAdminDto,
+  SignInAppleDto,
+  SignInGoogleDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { JwtAuthGuard } from 'auth/jwt-auth.guard';
 import { User } from 'auth/user.decorator';
 import { AccessTokenPayload } from 'auth/types';
@@ -18,6 +23,12 @@ import { AccessTokenPayload } from 'auth/types';
 @Controller({ path: 'users' })
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @ApiOperation({ summary: 'Admin Login' })
+  @Post('sign-in/admin')
+  async signInAdmin(@Body() dto: SignInAdminDto) {
+    return await this.usersService.signInAdmin(dto);
+  }
 
   @ApiOperation({ summary: 'Google Login' })
   @Post('sign-in/google')
