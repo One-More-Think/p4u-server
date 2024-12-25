@@ -37,4 +37,11 @@ export class UserOption {
   })
   @JoinColumn({ name: 'optionId' })
   option: Option;
+
+  static create(userId: number, optionId: number) {
+    const uo = new UserOption();
+    uo.userId = userId;
+    uo.optionId = optionId;
+    return uo;
+  }
 }
