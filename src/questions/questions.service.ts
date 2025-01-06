@@ -28,6 +28,7 @@ export class QuestionsService {
         'writer.age',
         'writer.occupation',
         'writer.gender',
+        'writer.id',
       ])
       .leftJoin('question.writer', 'writer')
       .where(
@@ -47,10 +48,10 @@ export class QuestionsService {
       where: { id: questionId },
       relations: [
         'writer',
-        'writer.selectedOptions',
         'options',
         'comments',
         'comments.writer',
+        'options.selectedUsers',
       ],
     });
     if (!question) {
@@ -72,9 +73,10 @@ export class QuestionsService {
     this.dataSource.transaction(async (manager) => {
       const question = manager.create(Question, {
         writerId,
+        category: dto.category,
         title: dto.title,
         description: dto.description,
-        category: dto.category,
+        timeout: Date.now() + dto.timeout,
       });
       await manager.save(question);
 

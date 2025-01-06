@@ -28,17 +28,17 @@ export class UserOptionsService {
         throw new NotFoundException(`Question ID ${dto.questionId} not found.`);
       }
       const optionIds = question.options.map((option) => option.id);
-
-      const userOptions = await this.userOptionRepository.find({
-        where: { userId, optionId: In(optionIds) },
+      const userOptions = await this.userOptionRepository.findOne({
+        where: { userId, optionId: In(optionIds), questionId: dto.questionId },
       });
 
-      if (userOptions.length > 0) {
-        throw new ForbiddenException('User already selected option.');
+      if (userOptions) {
+        userOptions['optionId'] = dto.optionId;
+        await this.userOptionRepository.save(userOptions);
+      } else {
+        const uo = UserOption.create(userId, dto.optionId, dto.questionId);
+        await this.userOptionRepository.save(uo);
       }
-
-      const uo = UserOption.create(userId, dto.optionId);
-      await this.userOptionRepository.save(uo);
     } catch (error) {
       console.error(error);
       throw error;

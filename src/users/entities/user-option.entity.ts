@@ -20,6 +20,9 @@ export class UserOption {
   @Column('int')
   optionId: number; // FK
 
+  @Column('int', { nullable: false, default: 0 })
+  questionId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -38,10 +41,11 @@ export class UserOption {
   @JoinColumn({ name: 'optionId' })
   option: Option;
 
-  static create(userId: number, optionId: number) {
+  static create(userId: number, optionId: number, questionId: number) {
     const uo = new UserOption();
     uo.userId = userId;
     uo.optionId = optionId;
+    uo.questionId = questionId;
     return uo;
   }
 }
