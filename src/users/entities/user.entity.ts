@@ -32,13 +32,13 @@ export class User {
   @Column({ length: 30, nullable: true })
   gender?: string;
 
-  @Column('smallint', { nullable: true })
+  @Column('smallint', { default: 0 })
   age?: number;
 
   @Column({ length: 100, nullable: true })
   occupation?: string;
 
-  @Column({ length: 300, nullable: true, comment: '자기소개' })
+  @Column({ length: 300, nullable: true, comment: 'aboutme' })
   aboutMe?: string;
 
   @Column('boolean', { default: false })

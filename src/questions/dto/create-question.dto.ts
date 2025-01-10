@@ -24,6 +24,13 @@ export class CreateQuestionDto {
   language: string;
 
   @ApiProperty({
+    name: 'timeout',
+    description: 'Timeout of the question',
+    example: '300/1800/3600/86400',
+  })
+  timeout: number;
+
+  @ApiProperty({
     name: 'category',
     description: 'Category of the question',
     example: CATEGORY.LIVING,
