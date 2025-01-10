@@ -28,6 +28,7 @@ export class QuestionsService {
         'writer.age',
         'writer.occupation',
         'writer.gender',
+        'writer.id',
       ])
       .leftJoin('question.writer', 'writer')
       .where(
@@ -45,7 +46,13 @@ export class QuestionsService {
   async getQuestionById(questionId: number) {
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
-      relations: ['writer', 'options', 'comments', 'comments.writer'],
+      relations: [
+        'writer',
+        'options',
+        'comments',
+        'comments.writer',
+        'options.selectedUsers',
+      ],
     });
     if (!question) {
       throw new NotFoundException(`Question ID ${questionId} not found.`);
@@ -76,9 +83,10 @@ export class QuestionsService {
     this.dataSource.transaction(async (manager) => {
       const question = manager.create(Question, {
         writerId,
+        category: dto.category,
         title: dto.title,
         description: dto.description,
-        category: dto.category,
+        timeout: Date.now() + dto.timeout,
       });
       await manager.save(question);
 

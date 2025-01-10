@@ -41,6 +41,9 @@ export class Question {
   @Column('smallint', { default: 0 })
   report: number;
 
+  @Column('bigint', { default: 0 })
+  timeout: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
