@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
@@ -40,14 +40,16 @@ export class CommentsService {
 
   async createComment(questionId: number, writerId: number, context: string) {
     try {
-      await this.questionsService.getQuestionById(questionId); // check exist question
+      const question = await this.questionsService.getQuestionById(questionId); // check exist question
+      if (!question) {
+        throw new NotFoundException(`Question ID ${questionId} not found.`);
+      }
       const comment = this.commentRepository.create({
         questionId,
         writerId,
         context,
       });
       await this.commentRepository.save(comment);
-      return await this.getComments(questionId);
     } catch (error) {
       console.error(error);
       throw error;

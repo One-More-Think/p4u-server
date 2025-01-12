@@ -23,6 +23,12 @@ export class Comment {
   @Column('varchar', { length: 100, nullable: true })
   context: string;
 
+  @Column('int', { default: 0 })
+  like: number; // FK
+
+  @Column('int', { default: 0 })
+  report: number; // FK
+
   @CreateDateColumn()
   createdAt: Date;
 

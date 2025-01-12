@@ -57,6 +57,10 @@ export class QuestionsService {
     if (!question) {
       throw new NotFoundException(`Question ID ${questionId} not found.`);
     }
+    question.comments.forEach((comment) => {
+      delete comment.questionId;
+      delete comment.writerId;
+    });
     delete question.writer.snsId;
     delete question.writer.snsType;
     delete question.writer.email;
