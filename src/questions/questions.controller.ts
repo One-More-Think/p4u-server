@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -21,11 +20,16 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { User } from 'auth/user.decorator';
 import { AccessTokenPayload } from 'auth/types';
 import { JwtAuthGuard } from 'auth/jwt-auth.guard';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { CommentsService } from './comments.service';
 
 @ApiTags('Question')
 @Controller({ path: 'questions' })
 export class QuestionsController {
-  constructor(private readonly questionsService: QuestionsService) {}
+  constructor(
+    private readonly questionsService: QuestionsService,
+    private readonly commentsService: CommentsService,
+  ) {}
 
   @ApiOperation({
     summary: 'Get Questions',
@@ -85,8 +89,26 @@ export class QuestionsController {
     description: 'Question ID',
     example: 1,
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':questionId')
   async getQuestion(@Param('questionId', ParseIntPipe) questionId: number) {
     return await this.questionsService.getQuestionById(questionId);
+  }
+
+  @ApiOperation({ summary: 'Create Comment' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':questionId/comments')
+  async createComment(
+    @Param('questionId', ParseIntPipe) questionId: number,
+    @Body() dto: CreateCommentDto,
+    @User() user: AccessTokenPayload,
+  ) {
+    return await this.commentsService.createComment(
+      questionId,
+      user.id,
+      dto.context,
+    );
   }
 }

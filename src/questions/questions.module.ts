@@ -9,6 +9,7 @@ import { UserOption } from 'users/entities/user-option.entity';
 import { UserOptionsController } from './user-options.controller';
 import { UserOptionsService } from './user-options.service';
 import { UsersModule } from 'users/users.module';
+import { CommentsService } from './comments.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { UsersModule } from 'users/users.module';
     UsersModule,
   ],
   controllers: [QuestionsController, UserOptionsController],
-  providers: [QuestionsService, UserOptionsService],
+  providers: [QuestionsService, UserOptionsService, CommentsService],
 })
 export class QuestionsModule {}
