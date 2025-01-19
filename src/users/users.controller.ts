@@ -4,8 +4,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Get,
   Put,
+  Param,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -62,5 +65,13 @@ export class UsersController {
     @Body() dto: UpdateUserDto,
   ) {
     await this.usersService.updateUser(user.id, dto);
+  }
+
+  @ApiOperation({ summary: 'User detail' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('detail/:userId')
+  async getUserDetail(@Param('userId', ParseIntPipe) userId: number) {
+    return await this.usersService.getUserDetail(userId);
   }
 }

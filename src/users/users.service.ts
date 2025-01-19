@@ -112,4 +112,83 @@ export class UsersService {
       throw error;
     }
   }
+
+  async getUserDetail(userId: number) {
+    try {
+      return await this.usersRepository
+        .createQueryBuilder('user')
+        .where({ id: userId })
+        .select([
+          'user.gender',
+          'user.age',
+          'user.email',
+          'user.country',
+          'user.occupation',
+          'user.aboutMe',
+          'writtenComments',
+          'writtenQuestions',
+          'commentedQuestions',
+          'commentedQuestionsWriter',
+          'writtenQuestionsWriter',
+        ])
+        .leftJoin('user.writtenComments', 'writtenComments')
+        .leftJoin('user.writtenQuestions', 'writtenQuestions')
+        .leftJoin('writtenComments.question', 'commentedQuestions')
+        .leftJoin('commentedQuestions.writer', 'commentedQuestionsWriter')
+        .leftJoin('writtenQuestions.writer', 'writtenQuestionsWriter')
+        .getOne()
+        .then((result) => {
+          let commentedQuestions = [];
+          let writtenQuestions = [];
+
+          if (result && result.writtenComments.length) {
+            commentedQuestions = result.writtenComments
+              .map((comment) => comment.question)
+              .filter(
+                (item, index, self) =>
+                  index === self.findIndex((obj) => obj.id === item.id),
+              )
+              .map((question) => {
+                const writer = {
+                  id: question.writer.id,
+                  country: question.writer.country,
+                  gender: question.writer.gender,
+                  age: question.writer.age,
+                  occupation: question.writer.occupation,
+                };
+                return {
+                  id: question.id,
+                  language: question.language,
+                  title: question.title,
+                  writer,
+                };
+              });
+          }
+
+          if (result && result.writtenQuestions.length) {
+            writtenQuestions = result.writtenQuestions.map((question) => {
+              const writer = {
+                id: question.writer.id,
+                country: question.writer.country,
+                gender: question.writer.gender,
+                age: question.writer.age,
+                occupation: question.writer.occupation,
+              };
+              return {
+                id: question.id,
+                language: question.language,
+                title: question.title,
+                writer,
+              };
+            });
+          }
+          delete result.writtenComments;
+
+          return { ...result, commentedQuestions, writtenQuestions };
+        });
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
 }
