@@ -44,5 +44,6 @@ export class Comment {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'questionId' })
   question: Question;
 }
