@@ -10,6 +10,7 @@ import {
 import { User } from 'users/entities/user.entity';
 import { Question } from './question.entity';
 import { CommentReaction } from 'users/entities/comment-reaction.entity';
+import { Expose } from 'class-transformer';
 
 @Entity({ name: 'comments', comment: 'Commented on question' })
 export class Comment {
@@ -30,6 +31,12 @@ export class Comment {
 
   @Column('int', { default: 0 })
   dislike: number;
+
+  @Expose()
+  isLiked: boolean;
+
+  @Expose()
+  isDisliked: boolean;
 
   @Column('int', { default: 0 })
   report: number;
@@ -53,4 +60,5 @@ export class Comment {
 
   @OneToMany(() => CommentReaction, (commentReaction) => commentReaction.comment)
   reactions: CommentReaction[];
+
 }

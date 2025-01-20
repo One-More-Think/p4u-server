@@ -10,13 +10,14 @@ import { UserOptionsController } from './user-options.controller';
 import { UserOptionsService } from './user-options.service';
 import { UsersModule } from 'users/users.module';
 import { CommentsService } from './comments.service';
+import { CommentsController } from './comments.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Question, Comment, Option, UserOption]),
     UsersModule,
   ],
-  controllers: [QuestionsController, UserOptionsController],
+  controllers: [QuestionsController, UserOptionsController, CommentsController],
   providers: [QuestionsService, UserOptionsService, CommentsService],
 })
-export class QuestionsModule {}
+export class QuestionsModule { }

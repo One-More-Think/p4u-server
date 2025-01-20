@@ -41,7 +41,7 @@ export class CommentsService {
 
   async createComment(questionId: number, writerId: number, context: string) {
     try {
-      const question = await this.questionsService.getQuestionById(questionId); // check exist question
+      const question = await this.questionsService.getQuestionById(questionId, writerId); // check exist question
       if (!question) {
         throw new NotFoundException(`Question ID ${questionId} not found.`);
       }
