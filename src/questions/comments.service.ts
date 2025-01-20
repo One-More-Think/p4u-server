@@ -64,7 +64,7 @@ export class CommentsService {
     isDislike: boolean,
   ) {
     try {
-      if (isLike === isDislike) {
+      if (isLike && isDislike) {
         throw new BadRequestException('You can only like or dislike a comment.');
       }
       const comment = await this.commentRepository.findOne({ where: { id: commentId } });
@@ -74,13 +74,6 @@ export class CommentsService {
 
       // start transaction
       await this.commentRepository.manager.transaction(async (manager) => {
-        // if (isLike) {
-        //   comment.like += 1;
-        // } else {
-        //   comment.dislike += 1;
-        // }
-        // await manager.save(comment);
-
         // check exist reaction
         const existReaction = await manager.findOne(CommentReaction, {
           where: { commentId, userId },
@@ -89,9 +82,14 @@ export class CommentsService {
           if (isLike) {
             existReaction.isLike = true;
             existReaction.isDislike = false;
-          } else {
+          }
+          else if (isDislike) {
             existReaction.isLike = false;
             existReaction.isDislike = true;
+          }
+          else {
+            existReaction.isLike = false;
+            existReaction.isDislike = false;
           }
           await manager.save(existReaction);
         } else {
