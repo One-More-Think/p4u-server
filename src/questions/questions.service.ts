@@ -15,7 +15,7 @@ export class QuestionsService {
     @InjectRepository(Question)
     private questionRepository: Repository<Question>,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async getQuestions(search: string, offset: number, limit: number) {
     return await this.questionRepository
@@ -43,13 +43,14 @@ export class QuestionsService {
       .getMany();
   }
 
-  async getQuestionById(questionId: number) {
+  async getQuestionById(questionId: number, userId: number) {
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
       relations: [
         'writer',
         'options',
         'comments',
+        'comments.reactions',
         'comments.writer',
         'options.selectedUsers',
       ],
@@ -60,6 +61,12 @@ export class QuestionsService {
     question.comments.forEach((comment) => {
       delete comment.questionId;
       delete comment.writerId;
+      comment.isLiked = comment.reactions.some(
+        (reaction) => reaction.userId === userId && reaction.isLike
+      );
+      comment.isDisliked = comment.reactions.some(
+        (reaction) => reaction.userId === userId && reaction.isDislike
+      );
     });
     delete question.writer.snsId;
     delete question.writer.snsType;
@@ -68,6 +75,7 @@ export class QuestionsService {
     delete question.writer.createdAt;
     delete question.writer.aboutMe;
     question.comments.map((comment) => {
+      delete comment.reactions;
       delete comment.writer.snsId;
       delete comment.writer.snsType;
       delete comment.writer.email;

@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserOption } from './user-option.entity';
+import { CommentReaction } from './comment-reaction.entity';
 
 @Entity({ name: 'users', comment: 'User' })
 export class User {
@@ -56,6 +57,9 @@ export class User {
 
   @OneToMany(() => UserOption, (userOption) => userOption.user)
   selectedOptions: UserOption[];
+
+  @OneToMany(() => CommentReaction, (commentReaction) => commentReaction.user)
+  commentReactions: CommentReaction[];
 
   static create(snsId: string, snsType: string, email: string) {
     const user = new User();

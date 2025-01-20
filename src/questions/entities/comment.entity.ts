@@ -4,10 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'users/entities/user.entity';
 import { Question } from './question.entity';
+import { CommentReaction } from 'users/entities/comment-reaction.entity';
+import { Expose } from 'class-transformer';
 
 @Entity({ name: 'comments', comment: 'Commented on question' })
 export class Comment {
@@ -24,10 +27,19 @@ export class Comment {
   context: string;
 
   @Column('int', { default: 0 })
-  like: number; // FK
+  like: number;
 
   @Column('int', { default: 0 })
-  report: number; // FK
+  dislike: number;
+
+  @Expose()
+  isLiked: boolean;
+
+  @Expose()
+  isDisliked: boolean;
+
+  @Column('int', { default: 0 })
+  report: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -35,7 +47,7 @@ export class Comment {
   // relations
   @ManyToOne(() => User, (user) => user.writtenComments, {
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE', // when user is deleted, delete all comments by writer?
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'writerId' })
   writer: User;
@@ -46,4 +58,8 @@ export class Comment {
   })
   @JoinColumn({ name: 'questionId' })
   question: Question;
+
+  @OneToMany(() => CommentReaction, (commentReaction) => commentReaction.comment)
+  reactions: CommentReaction[];
+
 }
