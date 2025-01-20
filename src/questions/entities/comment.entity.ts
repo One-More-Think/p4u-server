@@ -56,6 +56,7 @@ export class Comment {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'questionId' })
   question: Question;
 
   @OneToMany(() => CommentReaction, (commentReaction) => commentReaction.comment)
