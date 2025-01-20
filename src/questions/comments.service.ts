@@ -74,12 +74,12 @@ export class CommentsService {
 
       // start transaction
       await this.commentRepository.manager.transaction(async (manager) => {
-        if (isLike) {
-          comment.like += 1;
-        } else {
-          comment.dislike += 1;
-        }
-        await manager.save(comment);
+        // if (isLike) {
+        //   comment.like += 1;
+        // } else {
+        //   comment.dislike += 1;
+        // }
+        // await manager.save(comment);
 
         // check exist reaction
         const existReaction = await manager.findOne(CommentReaction, {
@@ -103,6 +103,11 @@ export class CommentsService {
           });
           await manager.save(newReaction);
         }
+
+        const commentReactions = await manager.find(CommentReaction, { where: { commentId } });
+        comment.like = commentReactions.filter((reaction) => reaction.isLike).length;
+        comment.dislike = commentReactions.filter((reaction) => reaction.isDislike).length;
+        await manager.save(comment);
       });
     } catch (error) {
       console.error(error);
