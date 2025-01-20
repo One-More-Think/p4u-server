@@ -26,10 +26,13 @@ export class Comment {
   context: string;
 
   @Column('int', { default: 0 })
-  like: number; // FK
+  like: number;
 
   @Column('int', { default: 0 })
-  report: number; // FK
+  dislike: number;
+
+  @Column('int', { default: 0 })
+  report: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -44,7 +47,7 @@ export class Comment {
 
   @ManyToOne(() => Question, (question) => question.comments, {
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   question: Question;
 

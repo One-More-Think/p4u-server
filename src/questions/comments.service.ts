@@ -77,7 +77,7 @@ export class CommentsService {
         if (isLike) {
           comment.like += 1;
         } else {
-          comment.report += 1;
+          comment.dislike += 1;
         }
         await manager.save(comment);
 
