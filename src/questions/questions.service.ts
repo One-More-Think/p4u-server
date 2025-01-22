@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -112,5 +113,21 @@ export class QuestionsService {
       await manager.save(options);
     });
     // return avoid or return question
+  }
+
+  async deleteQuestion(questionId: number, writerId: number) {
+    try {
+      const question = await this.questionRepository.findOne({ where: { id: questionId } });
+      if (!question) {
+        throw new NotFoundException(`Question ID ${questionId} not found.`);
+      }
+      if (question.writerId !== writerId) {
+        throw new ForbiddenException('You are not the writer of this question.');
+      }
+      await this.questionRepository.delete({ id: questionId });
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
   }
 }

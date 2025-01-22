@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -79,24 +80,28 @@ export class QuestionsController {
     return await this.questionsService.createQuestion(dto, user.id);
   }
 
-  @ApiOperation({
-    summary: 'Get Question',
-    description: 'Get a question by questionId.',
-  })
-  @ApiParam({
-    name: 'questionId',
-    type: Number,
-    description: 'Question ID',
-    example: 1,
-  })
+  @ApiOperation({ summary: 'Get Question', description: 'Get a question by questionId.' })
+  @ApiParam({ name: 'questionId', type: Number, description: 'Question ID', example: 1 })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Get(':questionId')
+  @Get('/:questionId')
   async getQuestion(
     @Param('questionId', ParseIntPipe) questionId: number,
     @User() user: AccessTokenPayload,
   ) {
     return await this.questionsService.getQuestionById(questionId, user.id);
+  }
+
+  @ApiOperation({ summary: 'Delete Question', description: 'Delete a question by questionId.' })
+  @ApiParam({ name: 'questionId', type: Number, description: 'Question ID', example: 1 })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:questionId')
+  async deleteQuestion(
+    @Param('questionId', ParseIntPipe) questionId: number,
+    @User() user: AccessTokenPayload,
+  ) {
+    await this.questionsService.deleteQuestion(questionId, user.id);
   }
 
   @ApiOperation({ summary: 'Create Comment' })
