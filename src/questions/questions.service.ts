@@ -161,7 +161,7 @@ export class QuestionsService {
 
         // update question
         await manager.update(Question, questionId, {
-          // category??
+          category: dto.category,
           title: dto.title,
           description: dto.description,
         });
