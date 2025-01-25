@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -29,11 +30,12 @@ export class QuestionsController {
   constructor(
     private readonly questionsService: QuestionsService,
     private readonly commentsService: CommentsService,
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: 'Get Questions',
-    description: 'Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset\'s default value** is `0` and **limit\'s default value** is `10`.',
+    description:
+      "Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset's default value** is `0` and **limit's default value** is `10`.",
   })
   @ApiQuery({
     name: 'offset',
@@ -97,6 +99,26 @@ export class QuestionsController {
     @User() user: AccessTokenPayload,
   ) {
     return await this.questionsService.getQuestionById(questionId, user.id);
+  }
+
+  @ApiOperation({
+    summary: 'Delete Question',
+    description: 'Delete a question by questionId.',
+  })
+  @ApiParam({
+    name: 'questionId',
+    type: Number,
+    description: 'Question ID',
+    example: 1,
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':questionId')
+  async deleteQuestion(
+    @Param('questionId', ParseIntPipe) questionId: number,
+    @User() user: AccessTokenPayload,
+  ) {
+    await this.questionsService.deleteQuestion(questionId, user.id);
   }
 
   @ApiOperation({ summary: 'Create Comment' })
