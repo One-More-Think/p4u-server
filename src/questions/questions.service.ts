@@ -165,23 +165,6 @@ export class QuestionsService {
           title: dto.title,
           description: dto.description,
         });
-
-        // add new options
-        if (dto.options.length !== 0) {
-          const currentOptionCount = question.options.length;
-          if (currentOptionCount + dto.options.length > MAX_ALLOWED_OPTIONS) {
-            throw new BadRequestException(
-              `Options must be between 1 and ${MAX_ALLOWED_OPTIONS}`,
-            );
-          }
-          await manager.save(
-            Option,
-            dto.options.map((option) => ({
-              context: option,
-              questionId: question.id,
-            })),
-          );
-        }
       });
     } catch (error) {
       console.log(error.message);
