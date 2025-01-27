@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +24,7 @@ import { AccessTokenPayload } from 'auth/types';
 import { JwtAuthGuard } from 'auth/jwt-auth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentsService } from './comments.service';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @ApiTags('Question')
 @Controller({ path: 'questions' })
@@ -119,6 +121,23 @@ export class QuestionsController {
     @User() user: AccessTokenPayload,
   ) {
     await this.questionsService.deleteQuestion(questionId, user.id);
+  }
+
+  @ApiParam({
+    name: 'questionId',
+    type: Number,
+    description: 'Question ID',
+    example: 1,
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Put(':questionId')
+  async updateQuestion(
+    @Param('questionId', ParseIntPipe) questionId: number,
+    @User() user: AccessTokenPayload,
+    @Body() dto: UpdateQuestionDto,
+  ) {
+    return await this.questionsService.updateQuestion(questionId, user.id, dto);
   }
 
   @ApiOperation({ summary: 'Create Comment' })

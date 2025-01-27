@@ -9,6 +9,9 @@ import { Question } from './entities/question.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Option } from './entities/option.entity';
+import { UpdateQuestionDto } from './dto/update-question.dto';
+
+const MAX_ALLOWED_OPTIONS = 3;
 
 @Injectable()
 export class QuestionsService {
@@ -16,7 +19,7 @@ export class QuestionsService {
     @InjectRepository(Question)
     private questionRepository: Repository<Question>,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async getQuestions(search: string, offset: number, limit: number) {
     return await this.questionRepository
@@ -63,10 +66,10 @@ export class QuestionsService {
       delete comment.questionId;
       delete comment.writerId;
       comment.isLiked = comment.reactions.some(
-        (reaction) => reaction.userId === userId && reaction.isLike
+        (reaction) => reaction.userId === userId && reaction.isLike,
       );
       comment.isDisliked = comment.reactions.some(
-        (reaction) => reaction.userId === userId && reaction.isDislike
+        (reaction) => reaction.userId === userId && reaction.isDislike,
       );
     });
     delete question.writer.snsId;
@@ -117,14 +120,52 @@ export class QuestionsService {
 
   async deleteQuestion(questionId: number, writerId: number) {
     try {
-      const question = await this.questionRepository.findOne({ where: { id: questionId } });
+      const question = await this.questionRepository.findOne({
+        where: { id: questionId },
+      });
       if (!question) {
         throw new NotFoundException(`Question ID ${questionId} not found.`);
       }
       if (question.writerId !== writerId) {
-        throw new ForbiddenException('You are not the writer of this question.');
+        throw new ForbiddenException(
+          'You are not the writer of this question.',
+        );
       }
       await this.questionRepository.delete({ id: questionId });
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+
+  async updateQuestion(
+    questionId: number,
+    writerId: number,
+    dto: UpdateQuestionDto,
+  ) {
+    try {
+      // start transaction
+      await this.dataSource.transaction(async (manager) => {
+        const question = await manager.findOne(Question, {
+          where: { id: questionId },
+          relations: ['options'],
+        });
+        if (!question) {
+          throw new NotFoundException(`Question ID ${questionId} not found.`);
+        }
+        if (question.writerId !== writerId) {
+          throw new ForbiddenException(
+            'You are not the writer of this question.',
+          );
+        }
+
+        // update question
+        await manager.update(Question, questionId, {
+          category: dto.category,
+          title: dto.title,
+          description: dto.description,
+        });
+      });
     } catch (error) {
       console.log(error.message);
       throw error;
