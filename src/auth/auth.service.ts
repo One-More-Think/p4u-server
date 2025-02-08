@@ -70,11 +70,27 @@ export class AuthService {
       if (user.isBanned) {
         throw new ForbiddenException('Banned user.');
       }
-      return {
+      const payload: AccessTokenPayload = {
         id: user.id,
         snsId: user.snsId,
         snsType: user.snsType,
         email: user.email,
+      };
+      const accessToken = await this.generateAccessToken(payload);
+      const refreshToken = await this.generateRefreshToken(user.id);
+      const userInfo = {
+        id: user.id,
+        email: user.email,
+        age: user.age,
+        gender: user.gender,
+        aboutMe: user.aboutMe,
+        country: user.country,
+        occupation: user.occupation,
+      };
+      return {
+        userInfo,
+        accessToken,
+        refreshToken,
       };
     } catch (error) {
       console.log(error.message);
