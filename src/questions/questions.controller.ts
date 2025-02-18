@@ -107,11 +107,24 @@ export class QuestionsController {
     @Query('category') category: CATEGORY | null = null,
     @Query('sort') sort: string | null = null,
     @Query('age') age: string | null = null,
-    @Query('gender') gender: string | null = null,
+    @Query('gender') gender: string | null = undefined, // specify undefined
     @Query('country') country: string | null = null,
   ) {
+    console.log('search:', search);
     console.log('category:', category);
-    return await this.questionsService.getQuestions(search, +offset, +limit);
+    console.log('sort:', sort);
+    console.log('age:', age);
+    console.log('gender', gender);
+    console.log('country:', country);
+    if (!search) {
+      console.log('By Filters');
+      return await this.questionsService.getQuestionsByFilter(
+        category, sort, age, gender, country, +offset, +limit,
+      );
+    } else {
+      console.log('By Search');
+      return await this.questionsService.getQuestions(search, +offset, +limit);
+    }
   }
 
   @ApiOperation({ summary: 'Create Question' })

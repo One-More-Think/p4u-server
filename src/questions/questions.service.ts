@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Question } from './entities/question.entity';
+import { CATEGORY, Question } from './entities/question.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Option } from './entities/option.entity';
@@ -19,7 +19,7 @@ export class QuestionsService {
     @InjectRepository(Question)
     private questionRepository: Repository<Question>,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async getQuestions(search: string, offset: number, limit: number) {
     return await this.questionRepository
@@ -45,6 +45,85 @@ export class QuestionsService {
       .skip(limit * offset)
       .take(limit)
       .getMany();
+  }
+
+  async getQuestionsByFilter(
+    category: CATEGORY,
+    sort: string, // Recent, View, Comment, Progress
+    age: string, // 10s, 20s, 30s, 40s, 50s, 60s, ...
+    gender: string, // Male, Female, None
+    country: string, // AF, AL, DZ, ... ZW
+    offset: number,
+    limit: number,
+  ) {
+    try {
+      const qb = this.questionRepository
+        .createQueryBuilder('question')
+        .select([
+          'question.id',
+          'question.title',
+          'question.language',
+          'writer.country',
+          'writer.age',
+          'writer.occupation',
+          'writer.gender',
+          'writer.id',
+        ])
+        .leftJoin('question.writer', 'writer');
+
+      if (category) {
+        console.log('Added category filter');
+        qb.andWhere('question.category = :category', { category });
+      }
+
+      if (age) {
+        console.log('Added age filter');
+        // if age is 10s, bring all users whose age is between 10 and 19
+        const minAge = +age.slice(0, -1);
+        qb.andWhere('writer.age BETWEEN :min AND :max', {
+          min: minAge,
+          max: minAge + 9,
+        });
+      }
+
+      if (gender !== undefined) {
+        console.log('Added gender filter');
+        qb.andWhere('writer.gender = :gender', { gender });
+      }
+
+      if (country) {
+        console.log('Added country filter');
+        qb.andWhere('writer.country = :country', { country });
+      }
+
+      // if (sort) {
+      //   console.log('Added sort filter');
+      //   switch (sort) {
+      //     case 'recent':
+      //       qb.orderBy('question.id', 'DESC');
+      //       break;
+      //     // case 'view': >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> todo
+      //     //   qb.orderBy('question.views', 'DESC');
+      //     // break;
+      //     // case 'comment': // compare with the number of comments >>>>>>> todo
+      //     //   qb.orderBy('question.comments', 'DESC');
+      //     //   break;
+      //     // case 'progress':
+      //     //   qb.orderBy('question.progress', 'DESC');
+      //     //   break;
+      //     default:
+      //       qb.orderBy('question.id', 'DESC'); // default is recent
+      //   }
+      // } else {
+      //   qb.orderBy('question.id', 'DESC');
+      // }
+
+      qb.orderBy('question.id', 'DESC'); // default
+      return await qb.skip(limit * offset).take(limit).getMany();
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
   }
 
   async getQuestionById(questionId: number, userId: number) {
