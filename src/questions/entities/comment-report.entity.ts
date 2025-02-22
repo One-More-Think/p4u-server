@@ -5,11 +5,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from 'users/entities/user.entity';
 import { Comment } from 'questions/entities/comment.entity';
 
-@Entity({ name: 'comment_reactions', comment: 'Reactions to comments' })
-export class CommentReaction {
+@Entity({ name: 'comment_report', comment: 'Report to comments' })
+export class CommentReport {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,23 +19,20 @@ export class CommentReaction {
   @Column('int')
   commentId: number; // FK
 
-  @Column('boolean', { default: false })
-  isLike: boolean;
-
-  @Column('boolean', { default: false })
-  isDislike: boolean;
-
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column('boolean', { default: true })
+  isReported: boolean;
+
   // relations
-  @ManyToOne(() => User, (user) => user.commentReactions, {
+  @ManyToOne(() => User, (user) => user.commentReports, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   user: User;
 
-  @ManyToOne(() => Comment, (comment) => comment.reactions, {
+  @ManyToOne(() => Comment, (comment) => comment.reports, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })

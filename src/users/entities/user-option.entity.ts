@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from 'users/entities/user.entity';
 import { Option } from 'questions/entities/option.entity';
 
 @Entity({ name: 'user_options', comment: 'Selected options by users' })
