@@ -73,5 +73,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unsafe-enum-comparison': 'off',
     '@typescript-eslint/no-extraneous-class': 'off',
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn"
   },
 };

@@ -25,6 +25,7 @@ import { JwtAuthGuard } from 'auth/jwt-auth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentsService } from './comments.service';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { CATEGORY } from './entities/question.entity';
 
 @ApiTags('Question')
 @Controller({ path: 'questions' })
@@ -32,12 +33,12 @@ export class QuestionsController {
   constructor(
     private readonly questionsService: QuestionsService,
     private readonly commentsService: CommentsService,
-  ) {}
+  ) { }
 
   @ApiOperation({
     summary: 'Get Questions',
     description:
-      "Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset's default value** is `0` and **limit's default value** is `10`.",
+      'Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset\'s default value** is `0` and **limit\'s default value** is `10`.',
   })
   @ApiQuery({
     name: 'offset',
@@ -63,13 +64,67 @@ export class QuestionsController {
     example: 'question',
     default: null,
   })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: CATEGORY,
+    description: 'Filter by category.',
+    default: null,
+  })
+  @ApiQuery({
+    name: 'sort',
+    type: String,
+    required: false,
+    description: 'Only `recent`, `view`, `comment` and `progress`',
+    default: null,
+  })
+  @ApiQuery({
+    name: 'age',
+    type: String,
+    required: false,
+    description: 'Filter by only `10s`, `20s`, `30s`, `40s` and `50s`',
+    default: null,
+  })
+  @ApiQuery({
+    name: 'gender',
+    type: String,
+    required: false,
+    description: 'Only `male` and `female`',
+    default: null,
+  })
+  @ApiQuery({
+    name: 'country',
+    type: String,
+    required: false,
+    description: 'Filter by `Country Code`',
+    default: null,
+  })
   @Get()
   async getQuestions(
     @Query('offset') offset: number = 0,
     @Query('limit') limit: number = 10,
     @Query('search') search: string | null = null,
+    @Query('category') category: CATEGORY | null = null,
+    @Query('sort') sort: string | null = null,
+    @Query('age') age: string | null = null,
+    @Query('gender') gender: string | null = undefined, // specify undefined
+    @Query('country') country: string | null = null,
   ) {
-    return await this.questionsService.getQuestions(search, +offset, +limit);
+    console.log('search:', search);
+    console.log('category:', category);
+    console.log('sort:', sort);
+    console.log('age:', age);
+    console.log('gender', gender);
+    console.log('country:', country);
+    if (!search) {
+      console.log('By Filters');
+      return await this.questionsService.getQuestionsByFilter(
+        category, sort, age, gender, country, +offset, +limit,
+      );
+    } else {
+      console.log('By Search');
+      return await this.questionsService.getQuestions(search, +offset, +limit);
+    }
   }
 
   @ApiOperation({ summary: 'Create Question' })
