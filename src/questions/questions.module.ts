@@ -20,4 +20,4 @@ import { CommentsController } from './comments.controller';
   controllers: [QuestionsController, UserOptionsController, CommentsController],
   providers: [QuestionsService, UserOptionsService, CommentsService],
 })
-export class QuestionsModule { }
+export class QuestionsModule {}

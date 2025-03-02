@@ -26,6 +26,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentsService } from './comments.service';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { CATEGORY } from './entities/question.entity';
+import { QuestionIsWriter } from 'auth/question.decorator';
 
 @ApiTags('Question')
 @Controller({ path: 'questions' })
@@ -33,12 +34,12 @@ export class QuestionsController {
   constructor(
     private readonly questionsService: QuestionsService,
     private readonly commentsService: CommentsService,
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: 'Get Questions',
     description:
-      'Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset\'s default value** is `0` and **limit\'s default value** is `10`.',
+      "Get a list of questions.<br>If offset is 0 and limit is 10, it will return the first 10 questions.<br>If offset is 1 and limit is 10, it will return the next 10 questions.<br><br>**Offset's default value** is `0` and **limit's default value** is `10`.",
   })
   @ApiQuery({
     name: 'offset',
@@ -119,7 +120,13 @@ export class QuestionsController {
     if (!search) {
       console.log('By Filters');
       return await this.questionsService.getQuestionsByFilter(
-        category, sort, age, gender, country, +offset, +limit,
+        category,
+        sort,
+        age,
+        gender,
+        country,
+        +offset,
+        +limit,
       );
     } else {
       console.log('By Search');
@@ -169,7 +176,7 @@ export class QuestionsController {
     example: 1,
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, QuestionIsWriter)
   @Delete(':questionId')
   async deleteQuestion(
     @Param('questionId', ParseIntPipe) questionId: number,
@@ -185,7 +192,7 @@ export class QuestionsController {
     example: 1,
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, QuestionIsWriter)
   @Put(':questionId')
   async updateQuestion(
     @Param('questionId', ParseIntPipe) questionId: number,
