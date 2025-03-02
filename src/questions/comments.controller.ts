@@ -1,5 +1,10 @@
 import {
-  Body, Controller, Param, Put, UseGuards,
+  Body,
+  Controller,
+  Param,
+  Put,
+  Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'auth/jwt-auth.guard';
@@ -7,13 +12,12 @@ import { AccessTokenPayload } from 'auth/types';
 import { User } from 'auth/user.decorator';
 import { CommentsService } from './comments.service';
 import { UpdateCommentReactionDto } from './dto/update-comment-reaction.dto';
+import { CommentWriterValid } from 'auth/comment.decorator';
 
 @ApiTags('Comment')
 @Controller({ path: 'comments' })
 export class CommentsController {
-  constructor(
-    private readonly commentsService: CommentsService,
-  ) { }
+  constructor(private readonly commentsService: CommentsService) {}
 
   @ApiOperation({ summary: 'React to a comment' })
   @ApiBearerAuth()
@@ -24,6 +28,23 @@ export class CommentsController {
     @User() user: AccessTokenPayload,
     @Body() dto: UpdateCommentReactionDto,
   ) {
-    await this.commentsService.reactToComment(commentId, user.id, dto.isLike, dto.isDislike);
+    await this.commentsService.reactToComment(
+      commentId,
+      user.id,
+      dto.isLike,
+      dto.isDislike,
+    );
+  }
+
+  @ApiOperation({ summary: 'Delete comment' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, CommentWriterValid)
+  @Delete(':commentId')
+  async deleteComment(
+    @Param('commentId') commentId: number,
+    // @User() user: AccessTokenPayload,
+    // @Body() dto: UpdateCommentReactionDto,
+  ) {
+    await this.commentsService.deleteComment(commentId);
   }
 }

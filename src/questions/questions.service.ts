@@ -19,7 +19,7 @@ export class QuestionsService {
     @InjectRepository(Question)
     private questionRepository: Repository<Question>,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async getQuestions(search: string, offset: number, limit: number) {
     return await this.questionRepository
@@ -119,7 +119,10 @@ export class QuestionsService {
       // }
 
       qb.orderBy('question.id', 'DESC'); // default
-      return await qb.skip(limit * offset).take(limit).getMany();
+      return await qb
+        .skip(limit * offset)
+        .take(limit)
+        .getMany();
     } catch (error) {
       console.log(error.message);
       throw error;
@@ -202,14 +205,7 @@ export class QuestionsService {
       const question = await this.questionRepository.findOne({
         where: { id: questionId },
       });
-      if (!question) {
-        throw new NotFoundException(`Question ID ${questionId} not found.`);
-      }
-      if (question.writerId !== writerId) {
-        throw new ForbiddenException(
-          'You are not the writer of this question.',
-        );
-      }
+
       await this.questionRepository.delete({ id: questionId });
     } catch (error) {
       console.log(error.message);
@@ -229,14 +225,6 @@ export class QuestionsService {
           where: { id: questionId },
           relations: ['options'],
         });
-        if (!question) {
-          throw new NotFoundException(`Question ID ${questionId} not found.`);
-        }
-        if (question.writerId !== writerId) {
-          throw new ForbiddenException(
-            'You are not the writer of this question.',
-          );
-        }
 
         // update question
         await manager.update(Question, questionId, {

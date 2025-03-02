@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +15,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
     private questionsService: QuestionsService,
-  ) { }
+  ) {}
 
   async getComments(questionId: number) {
     try {
@@ -41,7 +45,10 @@ export class CommentsService {
 
   async createComment(questionId: number, writerId: number, context: string) {
     try {
-      const question = await this.questionsService.getQuestionById(questionId, writerId); // check exist question
+      const question = await this.questionsService.getQuestionById(
+        questionId,
+        writerId,
+      ); // check exist question
       if (!question) {
         throw new NotFoundException(`Question ID ${questionId} not found.`);
       }
@@ -65,9 +72,13 @@ export class CommentsService {
   ) {
     try {
       if (isLike && isDislike) {
-        throw new BadRequestException('You can only like or dislike a comment.');
+        throw new BadRequestException(
+          'You can only like or dislike a comment.',
+        );
       }
-      const comment = await this.commentRepository.findOne({ where: { id: commentId } });
+      const comment = await this.commentRepository.findOne({
+        where: { id: commentId },
+      });
       if (!comment) {
         throw new NotFoundException(`Comment ID ${commentId} not found.`);
       }
@@ -82,12 +93,10 @@ export class CommentsService {
           if (isLike) {
             existReaction.isLike = true;
             existReaction.isDislike = false;
-          }
-          else if (isDislike) {
+          } else if (isDislike) {
             existReaction.isLike = false;
             existReaction.isDislike = true;
-          }
-          else {
+          } else {
             existReaction.isLike = false;
             existReaction.isDislike = false;
           }
@@ -102,11 +111,26 @@ export class CommentsService {
           await manager.save(newReaction);
         }
 
-        const commentReactions = await manager.find(CommentReaction, { where: { commentId } });
-        comment.like = commentReactions.filter((reaction) => reaction.isLike).length;
-        comment.dislike = commentReactions.filter((reaction) => reaction.isDislike).length;
+        const commentReactions = await manager.find(CommentReaction, {
+          where: { commentId },
+        });
+        comment.like = commentReactions.filter(
+          (reaction) => reaction.isLike,
+        ).length;
+        comment.dislike = commentReactions.filter(
+          (reaction) => reaction.isDislike,
+        ).length;
         await manager.save(comment);
       });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async deleteComment(commentId: number) {
+    try {
+      await this.commentRepository.delete({ id: commentId });
     } catch (error) {
       console.error(error);
       throw error;
