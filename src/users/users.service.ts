@@ -24,12 +24,6 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    // @InjectRepository(Comment)
-    // private commentRepository: Repository<Comment>,
-    // @InjectRepository(CommentReaction)
-    // private commentReactionRepository: Repository<CommentReaction>,
-    // @InjectRepository(Question)
-    // private questionRepository: Repository<Question>,
     private authService: AuthService,
     private dataSource: DataSource,
   ) {}
