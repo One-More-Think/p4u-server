@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
 import {
   SignInAdminDto,
@@ -15,6 +15,9 @@ import {
 import axios from 'axios';
 import { AuthService } from 'auth/auth.service';
 import appleSigninAuth from 'apple-signin-auth';
+import { CommentReaction } from './entities/comment-reaction.entity';
+import { Comment } from 'questions/entities/comment.entity';
+import { Question } from 'questions/entities/question.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +25,7 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private authService: AuthService,
+    private dataSource: DataSource,
   ) {}
 
   async signInAdmin(dto: SignInAdminDto) {
@@ -186,6 +190,52 @@ export class UsersService {
 
           return { ...result, commentedQuestions, writtenQuestions };
         });
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+
+  async deleteUser(userId: number) {
+    try {
+      // start transaction
+      await this.dataSource.transaction(async (manager) => {
+        const user = await manager.findOne(User, {
+          where: { id: userId },
+          relations: [
+            'writtenQuestions',
+            'writtenComments',
+            'selectedOptions',
+            'commentReactions',
+          ],
+          select: {
+            id: true,
+            writtenQuestions: { id: true },
+            writtenComments: { id: true },
+            selectedOptions: { id: true },
+            commentReactions: { id: true },
+          },
+          loadEagerRelations: false,
+        });
+
+        // delete comment reactions
+        user.commentReactions.forEach(async (commentReaction) => {
+          await manager.delete(CommentReaction, { id: commentReaction.id });
+        });
+
+        // delete comment
+        user.writtenComments.forEach(async (comment) => {
+          await manager.delete(Comment, { id: comment.id });
+        });
+
+        // delete question
+        user.writtenQuestions.forEach(async (question) => {
+          await manager.delete(Question, { id: question.id });
+        });
+
+        // delete user
+        await manager.delete(User, { id: userId });
+      });
     } catch (error) {
       console.log(error.message);
       throw error;
