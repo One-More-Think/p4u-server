@@ -218,10 +218,6 @@ export class UsersService {
           loadEagerRelations: false,
         });
 
-        user.writtenQuestions.forEach((question) => {
-          console.log(question.id);
-        });
-
         // delete comment reactions
         user.commentReactions.forEach(async (commentReaction) => {
           await manager.delete(CommentReaction, { id: commentReaction.id });
