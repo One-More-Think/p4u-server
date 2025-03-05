@@ -10,6 +10,7 @@ import {
   UseGuards,
   ParseIntPipe,
   ForbiddenException,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -26,7 +27,7 @@ import { AccessTokenPayload } from 'auth/types';
 @ApiTags('User')
 @Controller({ path: 'users' })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Admin Login' })
   @Post('sign-in/admin')
@@ -78,5 +79,19 @@ export class UsersController {
   @Get(':userId')
   async getUserDetail(@Param('userId', ParseIntPipe) userId: number) {
     return await this.usersService.getUserDetail(userId);
+  }
+
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':userId')
+  async deleteUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @User() user: AccessTokenPayload,
+  ) {
+    if (user.id !== userId) {
+      throw new ForbiddenException('Invalid user id');
+    }
+    return await this.usersService.deleteUser(userId);
   }
 }

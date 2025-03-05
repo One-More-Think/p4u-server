@@ -202,10 +202,6 @@ export class QuestionsService {
 
   async deleteQuestion(questionId: number, writerId: number) {
     try {
-      const question = await this.questionRepository.findOne({
-        where: { id: questionId },
-      });
-
       await this.questionRepository.delete({ id: questionId });
     } catch (error) {
       console.log(error.message);
@@ -221,11 +217,6 @@ export class QuestionsService {
     try {
       // start transaction
       await this.dataSource.transaction(async (manager) => {
-        const question = await manager.findOne(Question, {
-          where: { id: questionId },
-          relations: ['options'],
-        });
-
         // update question
         await manager.update(Question, questionId, {
           category: dto.category,
