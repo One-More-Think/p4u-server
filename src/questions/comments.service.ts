@@ -129,7 +129,7 @@ export class CommentsService {
     }
   }
 
-  async reportToComment(commentId: number, userId: number) {
+  async reportToComment(commentId: number, reporterId: number) {
     try {
       const comment = await this.commentRepository.findOne({
         where: { id: commentId },
@@ -140,25 +140,25 @@ export class CommentsService {
       }
 
       await this.commentRepository.manager.transaction(async (manager) => {
-        const existReport = await manager.findOne(CommentReport, {
-          where: { id: commentId, userId },
-        });
-        if (existReport) return;
-
-        const newReport = manager.create(CommentReport, {
-          commentId,
-          userId,
+        const reportedComments = await manager.find(CommentReport, {
+          where: { id: commentId },
         });
 
-        await manager.save(newReport);
-
-        const commentReport = await manager.find(CommentReport, {
-          where: { commentId },
+        // check reportedComment has reporterId
+        reportedComments.forEach((report) => {
+          if (report.userId === reporterId) {
+            throw new BadRequestException(
+              'You have already reported this comment.',
+            );
+          }
         });
-        comment.report = commentReport.filter(
-          (reaction) => reaction.isReported,
-        ).length;
-        await manager.save(comment);
+
+        if (reportedComments.length >= 2) {
+          // CommentReport will delete by cascade
+          await manager.delete(Comment, { id: commentId });
+        } else {
+          await manager.save(CommentReport, { commentId, userId: reporterId });
+        }
       });
     } catch (error) {
       console.error(error);

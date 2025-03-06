@@ -8,7 +8,7 @@ import {
 import { User } from 'users/entities/user.entity';
 import { Comment } from 'questions/entities/comment.entity';
 
-@Entity({ name: 'comment_report', comment: 'Report to comments' })
+@Entity({ name: 'comment_reports', comment: 'Report to comments' })
 export class CommentReport {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,9 +21,6 @@ export class CommentReport {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @Column('boolean', { default: true })
-  isReported: boolean;
 
   // relations
   @ManyToOne(() => User, (user) => user.commentReports, {

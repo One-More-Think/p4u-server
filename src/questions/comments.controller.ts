@@ -34,8 +34,8 @@ export class CommentsController {
   @Get(':commentId/report')
   async reportToComment(
     @Param('commentId') commentId: number,
-    @User() user: AccessTokenPayload,
+    @User() reporter: AccessTokenPayload,
   ) {
-    await this.commentsService.reportToComment(commentId, user.id);
+    await this.commentsService.reportToComment(commentId, reporter.id);
   }
 }
