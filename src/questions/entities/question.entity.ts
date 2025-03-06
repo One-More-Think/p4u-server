@@ -10,6 +10,7 @@ import {
 import { User } from 'users/entities/user.entity';
 import { Option } from './option.entity';
 import { Comment } from './comment.entity';
+import { QuestionReport } from './question-report.entity';
 
 export enum CATEGORY {
   LIVING,
@@ -60,4 +61,7 @@ export class Question {
 
   @OneToMany(() => Comment, (comment) => comment.question)
   comments: Comment[];
+
+  @OneToMany(() => QuestionReport, (questionReport) => questionReport.question)
+  reports: QuestionReport[];
 }

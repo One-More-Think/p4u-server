@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { Comment } from 'questions/entities/comment.entity';
+import { Question } from './question.entity';
 
-@Entity({ name: 'comment_reports', comment: 'Report to comments' })
-export class CommentReport {
+@Entity({ name: 'question_reports', comment: 'Report to questions' })
+export class QuestionReport {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -11,18 +11,18 @@ export class CommentReport {
   userId: number; // FK
 
   @Column('int')
-  commentId: number; // FK
+  questionId: number; // FK
 
   // relations
-  @ManyToOne(() => User, (user) => user.commentReports, {
+  @ManyToOne(() => User, (user) => user.questionReports, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   user: User;
 
-  @ManyToOne(() => Comment, (comment) => comment.reports, {
+  @ManyToOne(() => Question, (question) => question.reports, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  comment: Comment;
+  question: Question;
 }

@@ -5,7 +5,6 @@ import {
   Put,
   Delete,
   UseGuards,
-  Get,
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
