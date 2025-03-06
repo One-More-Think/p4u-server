@@ -38,7 +38,7 @@ export class CommentsController {
     );
   }
 
-  @ApiOperation({ summary: 'React to a comment' })
+  @ApiOperation({ summary: 'Report to a comment' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post(':commentId/report')
