@@ -33,20 +33,12 @@ export class Comment {
   @Column('int', { default: 0 })
   dislike: number;
 
-  @Expose()
-  isLiked: boolean;
-
-  @Expose()
-  isDisliked: boolean;
-
-  @Expose()
-  isReported: boolean;
-
-  @Column('int', { default: 0 })
-  report: number;
-
   @CreateDateColumn()
   createdAt: Date;
+
+  // only properties
+  isLiked: boolean;
+  isDisliked: boolean;
 
   // relations
   @ManyToOne(() => User, (user) => user.writtenComments, {
