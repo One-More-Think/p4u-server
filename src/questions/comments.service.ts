@@ -165,4 +165,13 @@ export class CommentsService {
       throw error;
     }
   }
+
+  async deleteComment(commentId: number) {
+    try {
+      await this.commentRepository.delete({ id: commentId });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
