@@ -5,6 +5,7 @@ import {
   Put,
   Delete,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'auth/jwt-auth.guard';
@@ -36,15 +37,22 @@ export class CommentsController {
     );
   }
 
+  @ApiOperation({ summary: 'Report to a comment' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':commentId/report')
+  async reportToComment(
+    @Param('commentId') commentId: number,
+    @User() reporter: AccessTokenPayload,
+  ) {
+    await this.commentsService.reportToComment(commentId, reporter.id);
+  }
+
   @ApiOperation({ summary: 'Delete comment' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, CommentWriterValid)
   @Delete(':commentId')
-  async deleteComment(
-    @Param('commentId') commentId: number,
-    // @User() user: AccessTokenPayload,
-    // @Body() dto: UpdateCommentReactionDto,
-  ) {
+  async deleteComment(@Param('commentId') commentId: number) {
     await this.commentsService.deleteComment(commentId);
   }
 }

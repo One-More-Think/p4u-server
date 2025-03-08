@@ -217,4 +217,15 @@ export class QuestionsController {
       dto.context,
     );
   }
+
+  @ApiOperation({ summary: 'Report to a Question' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':questionId/report')
+  async reportToQuestion(
+    @Param('questionId') questionId: number,
+    @User() reporter: AccessTokenPayload,
+  ) {
+    await this.questionsService.reportToQuestion(questionId, reporter.id);
+  }
 }

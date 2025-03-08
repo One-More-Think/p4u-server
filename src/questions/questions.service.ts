@@ -10,6 +10,7 @@ import { DataSource, Repository } from 'typeorm';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Option } from './entities/option.entity';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { QuestionReport } from './entities/question-report.entity';
 
 const MAX_ALLOWED_OPTIONS = 3;
 
@@ -226,6 +227,47 @@ export class QuestionsService {
       });
     } catch (error) {
       console.log(error.message);
+      throw error;
+    }
+  }
+
+  async reportToQuestion(questionId: number, reporterId: number) {
+    try {
+      const question = await this.questionRepository.findOne({
+        where: { id: questionId },
+      });
+
+      if (!question) {
+        throw new NotFoundException(`Question ID ${questionId} not found.`);
+      }
+
+      await this.questionRepository.manager.transaction(async (manager) => {
+        const reportedQuestions = await manager.find(QuestionReport, {
+          where: { questionId },
+        });
+
+        // check reportedQuestion has reporterId
+        reportedQuestions.forEach((report) => {
+          if (report.userId === reporterId) {
+            throw new BadRequestException(
+              'You have already reported this question.',
+            );
+          }
+        });
+
+        if (reportedQuestions.length >= 2) {
+          // QuestionReport will delete by cascade
+          await manager.delete(Question, { id: questionId });
+          await manager.delete(QuestionReport, { questionId });
+        } else {
+          await manager.save(QuestionReport, {
+            questionId,
+            userId: reporterId,
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error);
       throw error;
     }
   }

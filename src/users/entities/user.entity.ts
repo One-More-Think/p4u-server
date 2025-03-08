@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { UserOption } from './user-option.entity';
 import { CommentReaction } from './comment-reaction.entity';
+import { CommentReport } from 'questions/entities/comment-report.entity';
+import { QuestionReport } from 'questions/entities/question-report.entity';
 
 @Entity({ name: 'users', comment: 'User' })
 export class User {
@@ -60,6 +62,12 @@ export class User {
 
   @OneToMany(() => CommentReaction, (commentReaction) => commentReaction.user)
   commentReactions: CommentReaction[];
+
+  @OneToMany(() => CommentReport, (commentReport) => commentReport.user)
+  commentReports: CommentReport[];
+
+  @OneToMany(() => QuestionReport, (questionReport) => questionReport.user)
+  questionReports: QuestionReport[];
 
   static create(snsId: string, snsType: string, email: string) {
     const user = new User();

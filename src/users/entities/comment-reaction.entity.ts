@@ -1,5 +1,9 @@
 import {
-  Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Comment } from 'questions/entities/comment.entity';
@@ -25,9 +29,15 @@ export class CommentReaction {
   createdAt: Date;
 
   // relations
-  @ManyToOne(() => User, (user) => user.commentReactions, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.commentReactions, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Comment, (comment) => comment.reactions, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Comment, (comment) => comment.reactions, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   comment: Comment;
 }

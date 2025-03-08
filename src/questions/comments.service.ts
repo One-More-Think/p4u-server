@@ -8,6 +8,7 @@ import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
 import { QuestionsService } from './questions.service';
 import { CommentReaction } from 'users/entities/comment-reaction.entity';
+import { CommentReport } from './entities/comment-report.entity';
 
 @Injectable()
 export class CommentsService {
@@ -121,6 +122,44 @@ export class CommentsService {
           (reaction) => reaction.isDislike,
         ).length;
         await manager.save(comment);
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async reportToComment(commentId: number, reporterId: number) {
+    try {
+      const comment = await this.commentRepository.findOne({
+        where: { id: commentId },
+      });
+
+      if (!comment) {
+        throw new NotFoundException(`Comment ID ${commentId} not found.`);
+      }
+
+      await this.commentRepository.manager.transaction(async (manager) => {
+        const reportedComments = await manager.find(CommentReport, {
+          where: { commentId },
+        });
+
+        // check reportedComment has reporterId
+        reportedComments.forEach((report) => {
+          if (report.userId === reporterId) {
+            throw new BadRequestException(
+              'You have already reported this comment.',
+            );
+          }
+        });
+
+        if (reportedComments.length >= 2) {
+          // CommentReport will delete by cascade
+          await manager.delete(Comment, { id: commentId });
+          await manager.delete(CommentReport, { commentId });
+        } else {
+          await manager.save(CommentReport, { commentId, userId: reporterId });
+        }
       });
     } catch (error) {
       console.error(error);
