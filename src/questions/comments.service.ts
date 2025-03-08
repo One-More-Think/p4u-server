@@ -141,7 +141,7 @@ export class CommentsService {
 
       await this.commentRepository.manager.transaction(async (manager) => {
         const reportedComments = await manager.find(CommentReport, {
-          where: { id: commentId },
+          where: { commentId },
         });
 
         // check reportedComment has reporterId
@@ -156,6 +156,7 @@ export class CommentsService {
         if (reportedComments.length >= 2) {
           // CommentReport will delete by cascade
           await manager.delete(Comment, { id: commentId });
+          await manager.delete(CommentReport, { commentId });
         } else {
           await manager.save(CommentReport, { commentId, userId: reporterId });
         }

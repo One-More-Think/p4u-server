@@ -243,7 +243,7 @@ export class QuestionsService {
 
       await this.questionRepository.manager.transaction(async (manager) => {
         const reportedQuestions = await manager.find(QuestionReport, {
-          where: { id: questionId },
+          where: { questionId },
         });
 
         // check reportedQuestion has reporterId
@@ -258,6 +258,7 @@ export class QuestionsService {
         if (reportedQuestions.length >= 2) {
           // QuestionReport will delete by cascade
           await manager.delete(Question, { id: questionId });
+          await manager.delete(QuestionReport, { questionId });
         } else {
           await manager.save(QuestionReport, {
             questionId,
