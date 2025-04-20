@@ -53,13 +53,13 @@ export class InitV21737335533611 implements MigrationInterface {
       'INSERT INTO `users` (snsId, snsType, email, country, language, gender, age, occupation, aboutMe) VALUES ("sns_id_1", "apple", "apple1@icloud.com", "kr", "en", "male", 21,"developer", "Hi, I am Korean Dev"), ("sis_id_2", "google", "google2@gmail.com", "jp", "en", "female", 23,"teacher", "English Teacher"), ("sis_id_3", "google", "google3@gmail.com", "de", "en", "male", 32,"restaurant manager", "Steak House manager"), ("sis_id_4", "apple", "apple4@icloud.com", "ca", "en", "female", 25,"Football player", "Liverloop player"), ("sis_id_5", "google", "google5@gmail.com", "ca", "en", "male", 21,"student", "UBC student"), ("1234", "google", "admin", "ca", "en", "male", 23,"Administrator", "AWS Administrator")',
     );
     await queryRunner.query(
-      'INSERT INTO questions (writerId, title, description, category) VALUES (2, "Lunch Menu", "Can you pick today my lunch?", 2), (1, "Career Path", "I\'m small company developer but It\'s already been 3 years do I have to stay here or move to other company?", 1), (4, "Liverpool vs Manchester City", "Which team will win the game?", 0), (3, "Restaurant Event", "Which day you can come?", 2), (5, "Course Decision", "I\'m CS student, I\'m thinking to choose course between COMP-1532 and COMP-0812", 1), (6, "Server inspection", "Which Day is good to inspect server?", 0)',
+      'INSERT INTO questions (writerId, title, description, category) VALUES (2, "Lunch Menu", "Can you pick today my lunch?", "2"), (1, "Career Path", "I\'m small company developer but It\'s already been 3 years do I have to stay here or move to other company?", "1"), (4, "Liverpool vs Manchester City", "Which team will win the game?", "0"), (3, "Restaurant Event", "Which day you can come?", "2"), (5, "Course Decision", "I\'m CS student, I\'m thinking to choose course between COMP-1532 and COMP-0812", "1"), (6, "Server inspection", "Which Day is good to inspect server?", "0")',
     );
     await queryRunner.query(
       'INSERT INTO options (questionId, context) VALUES (1, "Chicken"),(1, "Pizza"), (1, "Bulgogi"), (2, "Move"), (2, "Stay"), (3, "Liverpool"), (3, "Manchester City"), (4, "Friday"), (4, "Saturday"), (4, "Sunday"), (5, "COMP-1532"), (5, "COMP-0812"), (6, "Thursday"), (6, "Friday"), (6, "Saturday")',
     );
     await queryRunner.query(
-      'INSERT INTO comments (writerId, questionId, context) VALUES (1, 6, "Mattew professor is good"), (3, 2, "Chicken is the best"), (4, 2, "For sure Pizza!!")',
+      'INSERT INTO comments (writerId, questionId, context) VALUES (1, 5, "Mattew professor is good"), (3, 1, "Chicken is the best"), (4, 1, "For sure Pizza!!")',
     );
 
     await queryRunner.query(

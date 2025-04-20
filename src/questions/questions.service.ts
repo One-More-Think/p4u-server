@@ -154,6 +154,12 @@ export class QuestionsService {
       comment.isDisliked = comment.reactions.some(
         (reaction) => reaction.userId === userId && reaction.isDislike,
       );
+      comment.liked = comment.reactions.filters(
+        (reaction) => reaction.isLike,
+      ).length;
+      comment.dislike = comment.reactions.filters(
+        (reaction) => reaction.isDislike,
+      ).length;
     });
     delete question.writer.snsId;
     delete question.writer.snsType;
