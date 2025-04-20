@@ -154,10 +154,10 @@ export class QuestionsService {
       comment.isDisliked = comment.reactions.some(
         (reaction) => reaction.userId === userId && reaction.isDislike,
       );
-      comment.liked = comment.reactions.filters(
+      comment.like = comment.reactions.filter(
         (reaction) => reaction.isLike,
       ).length;
-      comment.dislike = comment.reactions.filters(
+      comment.dislike = comment.reactions.filter(
         (reaction) => reaction.isDislike,
       ).length;
     });
